@@ -44,8 +44,8 @@ publishing {
 }
 
 bintray {
-    user = project.properties["bintrayUser"]?.toString() ?: System.getenv("BINTRAY_USER")
-    key = project.properties["bintrayKey"]?.toString() ?: System.getenv("BINTRAY_KEY")
+    user = project.properties["bintrayUser"] as? String ?: System.getenv("BINTRAY_USER")
+    key = project.properties["bintrayKey"] as? String ?: System.getenv("BINTRAY_KEY")
     setPublications("mavenJava")
     publish = true
     override = true
