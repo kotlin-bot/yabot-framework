@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.3.0" apply false
     java
+    jacoco
     id("com.gradle.build-scan") version "1.16"
     id("com.jfrog.bintray") version "1.8.1" apply false
 }

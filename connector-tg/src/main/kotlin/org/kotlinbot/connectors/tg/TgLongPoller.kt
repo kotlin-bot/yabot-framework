@@ -10,6 +10,7 @@ import org.kotlinbot.api.inevents.*
 import org.kotlinbot.api.inevents.Voice
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.ConnectException
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
@@ -33,6 +34,8 @@ class TgLongPoller(
                     .flatMap { convertToInEvents(it) }
                     .forEach { runBlocking { eventConsumer(it) } }
                 nextOffset = offset
+            } catch (e: ConnectException) {
+                logger.warn("Connection problem. Cant connect to tg api. Maybe you need proxy?")
             } catch (e: InterruptedException) {
                 Thread.currentThread().interrupt()
             } catch (e: SocketTimeoutException) {

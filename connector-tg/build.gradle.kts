@@ -37,7 +37,7 @@ publishing {
         create("mavenJava", MavenPublication::class.java) {
             from(components["java"])
             artifact(sourcesJar)
-            artifactId = "tests"
+            artifactId = "connector-tg"
 
         }
     }

@@ -37,7 +37,7 @@ publishing {
         create("mavenJava", MavenPublication::class.java) {
             from(components["java"])
             artifact(sourcesJar)
-            artifactId = "tests"
+            artifactId = "connector-vk"
 
         }
     }
@@ -54,7 +54,7 @@ bintray {
         repo = "snapshot"
         userOrg = "kotlin-bot"
         name = "connector-vk"
-        desc = "Connect your bot to VK"
+        desc = "Vk Connector"
         setLicenses("Apache-2.0")
         vcsUrl = "https://github.com/kotlin-bot/yabot-framework.git"
 

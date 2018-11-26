@@ -44,7 +44,7 @@ class SimpleBotRunner(val botShell: BotShell) {
 
     fun connectVk(groupId: Long, token: String): SimpleBotRunner {
         ensureClassExists(
-            "org.kotlinbot.connectors.vk.VkLongPoller",
+            "org.kotlinbot.connectors.vk.longpoll.VkLongPoller",
             "to connect bot to VK add vk-connector dependency"
         )
         val vkApi = MethodExecutorImpl(httpClient).withToken(token).throwExceptionsOnError()
@@ -71,7 +71,7 @@ class SimpleBotRunner(val botShell: BotShell) {
 
     fun connectTg(token: String): SimpleBotRunner {
         ensureClassExists(
-            "org.kotlinbot.connectors.vk.TgProfileResolver",
+            "org.kotlinbot.connectors.tg.TgLongPoller",
             "to connect bot to TG add tg-connector dependency"
         )
         profileResolvers[Origin.TG] = TgProfileResolver()
