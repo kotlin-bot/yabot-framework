@@ -17,6 +17,3 @@ cache:
 script:
 - ./gradlew check bintrayUpload -PbintrayUser=$BINTRAY_API_USER -PbintrayApiKey=$BINTRAY_API_KEY
 
-after_success:
-- ./gradlew jacocoTestReport
-- bash <(curl -s https://codecov.io/bash)
