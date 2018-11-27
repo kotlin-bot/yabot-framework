@@ -52,6 +52,15 @@ interface IntentActivator<T : BotScope> {
                     if (this.condition(event)) block else null
             }
         }
+
+        fun <T : BotScope> of(block: (suspend T.(event: InEvent) -> EventHandler<T>?)?): IntentActivator<T>? {
+            if (block == null)
+                return null
+
+            return object : IntentActivator<T> {
+                override suspend fun T.invoke(event: InEvent) = block(event)
+
+            }
+        }
     }
 }
-

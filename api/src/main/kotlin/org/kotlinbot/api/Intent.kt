@@ -1,5 +1,8 @@
 package org.kotlinbot.api
 
+import org.kotlinbot.api.IntentActivator.Companion.of
+import org.kotlinbot.api.inevents.InEvent
+
 interface Intent<SCOPE : BotScope> {
     val onElect: IntentActivator<SCOPE>? get() = null
 
@@ -13,6 +16,16 @@ interface Intent<SCOPE : BotScope> {
     val onCallback: CallbackHandler<SCOPE>? get() = null
 
     companion object {
+
+        fun <SCOPE : BotScope> fromHandler(
+            onEvent: EventHandler<SCOPE>? = null,
+            onStart: EventHandler<SCOPE>? = onEvent,
+            onInterrupt: EventHandler<SCOPE>? = null,
+            onReturn: EventHandler<SCOPE>? = null,
+            onCallback: CallbackHandler<SCOPE>? = null
+        ): Intent<SCOPE> =
+            IntentImpl(null, onStart, onEvent, onInterrupt, onReturn, onCallback)
+
         fun <SCOPE : BotScope> fromHandler(
             //вместо этой логики хорошо бы иметь возможность переключить на интент, отработать и вернуться
             //без возможности делать здесь любые действия
@@ -25,6 +38,16 @@ interface Intent<SCOPE : BotScope> {
             onCallback: CallbackHandler<SCOPE>? = null
         ): Intent<SCOPE> =
             IntentImpl(onElect, onStart, onEvent, onInterrupt, onReturn, onCallback)
+
+        fun <SCOPE : BotScope> fromHandler(
+            onElect: (suspend SCOPE.(event: InEvent) -> EventHandler<SCOPE>?)? = null,
+            onEvent: EventHandler<SCOPE>? = null,
+            onStart: EventHandler<SCOPE>? = onEvent,
+            onInterrupt: EventHandler<SCOPE>? = null,
+            onReturn: EventHandler<SCOPE>? = null,
+            onCallback: CallbackHandler<SCOPE>? = null
+        ): Intent<SCOPE> =
+            IntentImpl(of(onElect), onStart, onEvent, onInterrupt, onReturn, onCallback)
     }
 }
 
