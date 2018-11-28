@@ -41,8 +41,7 @@ data class ReplyHelperImpl(val callScope: BotScope, val inEvent: InEvent?) :
 
     override suspend fun textOtherwise(action: suspend (textMsg: Text) -> Unit) {
         if (!matched && msg is Text) {
-            require(msg is Text)
-            execute(action)
+            callScope.otherwise { action(msg) }
         }
     }
 
@@ -69,6 +68,6 @@ data class ReplyHelperImpl(val callScope: BotScope, val inEvent: InEvent?) :
     }
 }
 
-fun replyRouter(callScope: BotScope, event: InEvent): ReplyHelper {
+fun replyRouter(callScope: BotScope, event: InEvent?): ReplyHelper {
     return ReplyHelperImpl(callScope, event)
 }

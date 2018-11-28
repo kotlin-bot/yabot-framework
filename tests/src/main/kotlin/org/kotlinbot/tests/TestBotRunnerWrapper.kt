@@ -27,6 +27,7 @@ class TestBotRunnerWrapper(botShell: BotShell) :
 
         val botState = getBotStateForUser(userId)
         return createDynamicScope<S>(
+            botId = ONLY_BOT,
             userId = userId,
             chatId = userId,
             userProfile = botState.userProfile,

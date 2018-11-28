@@ -2,6 +2,7 @@ package org.kotlinbot.tests
 
 
 import org.kotlinbot.api.BotScope
+import org.kotlinbot.api.ONLY_BOT
 import org.kotlinbot.api.ReplyService
 import org.kotlinbot.api.UserProfile
 import org.kotlinbot.api.inevents.*
@@ -54,7 +55,7 @@ inline fun <reified SCOPE : BotScope> dynamicScopeFor(
 
     val s = ScopeFactory()
     val callContext = CallContext(
-//        botId = TEST_BOT_ID_1,
+        botId = ONLY_BOT,
         chatId = ChatId.testItem(),
         userId = UserId.testItem(),
         profile = UserProfile(UserId.testItem()),
@@ -64,5 +65,5 @@ inline fun <reified SCOPE : BotScope> dynamicScopeFor(
         otherwiseHandler = {}
     )
 
-    return s.createDynamicScope(SCOPE::class.java, callContext, serviceRegistry, values) to serviceRegistry
+    return s.createDynamicScope(SCOPE::class, callContext, serviceRegistry, values) to serviceRegistry
 }

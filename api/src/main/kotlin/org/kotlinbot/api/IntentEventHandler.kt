@@ -1,10 +1,11 @@
 package org.kotlinbot.api
 
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.reflect.KClass
 
 data class IntentEventHandler(
     val intentId: IntentId,
-    val scopeClasss: Class<out BotScope>,
+    val scopeClasss: KClass<out BotScope>,
     val intent: Intent<BotScope>,
     val callbackPrefixes: Set<String> = emptySet()
 ) {
@@ -19,7 +20,7 @@ data class IntentEventHandler(
 
             return IntentEventHandler(
                 intentId = intentName,
-                scopeClasss = T::class.java,
+                scopeClasss = T::class,
                 intent = Intent.fromHandler(onEvent = handler) as Intent<BotScope>,
                 callbackPrefixes = callbackPrefixers.toSet()
             )
@@ -40,7 +41,7 @@ data class IntentEventHandler(
         ): IntentEventHandler {
             return IntentEventHandler(
                 intentId = intentName,
-                scopeClasss = T::class.java,
+                scopeClasss = T::class,
                 intent = intent as Intent<BotScope>,
                 callbackPrefixes = callbackPrefixers.toSet()
             )

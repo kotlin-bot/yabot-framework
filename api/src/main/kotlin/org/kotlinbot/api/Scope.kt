@@ -5,7 +5,7 @@ import org.kotlinbot.api.inevents.MessageId
 import org.kotlinbot.api.inevents.UserId
 
 interface Scope : org.kotlinbot.api.inevents.Source {
-    //val botId: BotId
+    val botId: BotId
     val chatId: ChatId
     val userId: UserId
     val profile: UserProfile
