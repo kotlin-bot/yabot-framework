@@ -7,6 +7,7 @@ import org.kotlinbot.core.platform.scope.PropType.VARIABLE
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.jvm.javaType
 
 enum class MethodType(val prefix: String) {
     UNKNOWN(""), SETTER("set"), GETTER("get");
@@ -115,10 +116,10 @@ internal fun <S : Any> mapClassProperties(scopeClass: KClass<S>): Map<String, Pr
         .filter { prop -> !SCOPE_OWN_METHODS.contains(prop.name) }
         .map { prop ->
             prop.name to PropDefinition(
-                propType = if (prop is KMutableProperty<*>) VARIABLE else SERVICE,
+                propType = if (prop is KMutableProperty) VARIABLE else SERVICE,
                 name = prop.name,
                 nullable = prop.returnType.isMarkedNullable,
-                type = prop.returnType.javaClass
+                type = prop.returnType.javaType as Class<*>
             )
         }.toMap()
 }

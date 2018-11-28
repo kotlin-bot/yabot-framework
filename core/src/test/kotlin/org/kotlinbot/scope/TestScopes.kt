@@ -2,12 +2,17 @@ package org.kotlinbot.scope
 
 import org.kotlinbot.api.BotScope
 
+interface SomeService
+
+class SomeServiceImpl : SomeService
+
 interface Scope1 : BotScope {
     var stringParam: String
     var booleanParam: Boolean
     var intParam: Int
     var longParam: Long
     var nullableString: String?
+    val someService: SomeService
 }
 
 interface Scope2 : BotScope {

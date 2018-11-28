@@ -64,4 +64,13 @@ class ScopeFactoryTest {
 
         assertNull(scope.nullableString)
     }
+
+    @Test
+    fun `correct return services from registry`() {
+        val (dynScope, services) = dynamicScopeFor<Scope1>(emptyMap())
+        val someServiceImpl = SomeServiceImpl()
+        services[SomeService::class.java] = someServiceImpl
+        val scope = dynScope.asScope()
+        assertEquals(someServiceImpl, scope.someService)
+    }
 }
