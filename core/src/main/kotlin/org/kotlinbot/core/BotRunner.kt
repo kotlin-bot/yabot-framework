@@ -13,6 +13,7 @@ import org.kotlinbot.core.platform.scope.DynamicScope
 import org.kotlinbot.core.platform.scope.ScopeFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.reflect.KClass
 
 open class BotRunner(
     val botShell: BotShell,
@@ -109,6 +110,7 @@ open class BotRunner(
 
         val scope: DynamicScope<out BotScope> =
             createDynamicScope(
+                botState.botId,
                 callArguments.chatId,
                 callArguments.userId,
                 botState.userProfile,
@@ -257,6 +259,7 @@ open class BotRunner(
     protected suspend fun getBotStateForUser(userId: UserId) = botStateRepository.get(ONLY_BOT, userId)
 
     protected fun <T : BotScope> createDynamicScope(
+        botId: BotId,
         chatId: ChatId,
         userId: UserId,
         userProfile: UserProfile,
@@ -268,6 +271,7 @@ open class BotRunner(
     ): DynamicScope<T> {
 
         val callContext = CallContext(
+            botId = botId,
             chatId = chatId,
             userId = userId,
             profile = userProfile,
@@ -279,7 +283,7 @@ open class BotRunner(
 
 
         return scopeFactory.createDynamicScope(
-            getIntentById(intentId).scopeClasss as Class<T>,
+            getIntentById(intentId).scopeClasss as KClass<T>,
             callContext,
             joinedServiceRegistry,
             values

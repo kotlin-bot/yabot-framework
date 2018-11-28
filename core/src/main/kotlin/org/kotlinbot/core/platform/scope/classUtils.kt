@@ -5,6 +5,8 @@ import org.kotlinbot.core.platform.scope.MethodType.*
 import org.kotlinbot.core.platform.scope.PropType.SERVICE
 import org.kotlinbot.core.platform.scope.PropType.VARIABLE
 import java.lang.reflect.Method
+import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
 
 enum class MethodType(val prefix: String) {
     UNKNOWN(""), SETTER("set"), GETTER("get");
@@ -14,9 +16,9 @@ enum class PropType {
     VARIABLE, SERVICE
 }
 
-typealias ClassPropMap = Map<String, Pair<PropType, Class<*>>>
+typealias ClassPropMap = Map<String, PropDefinition>
 
-internal val SCOPE_OWN_METHODS = BotScope::class.java.methods.map { method ->
+internal val SCOPE_OWN_METHODS = BotScope::class.members.map { method ->
     method.name
 }.toSet()
 
@@ -74,7 +76,7 @@ internal fun scanParrentInterfaces(
         .forEach { scanParrentInterfaces(it, accumulator, *limitUpperClasses) }
 }
 
-internal fun <S> mapClassProperties(scopeClass: Class<S>): ClassPropMap {
+internal fun <S> mapClassProperties(scopeClass: Class<S>): MutableMap<String, Pair<PropType, Class<*>>> {
     val props = scopeClass.methods
         .filter { method -> !SCOPE_OWN_METHODS.contains(method.name) }
         .map {
@@ -99,4 +101,24 @@ internal fun <S> mapClassProperties(scopeClass: Class<S>): ClassPropMap {
         }
 
     return result
+}
+
+data class PropDefinition(
+    val propType: PropType,
+    val name: String,
+    val nullable: Boolean,
+    val type: Class<*>
+)
+
+internal fun <S : Any> mapClassProperties(scopeClass: KClass<S>): Map<String, PropDefinition> {
+    return scopeClass.members
+        .filter { prop -> !SCOPE_OWN_METHODS.contains(prop.name) }
+        .map { prop ->
+            prop.name to PropDefinition(
+                propType = if (prop is KMutableProperty<*>) VARIABLE else SERVICE,
+                name = prop.name,
+                nullable = prop.returnType.isMarkedNullable,
+                type = prop.returnType.javaClass
+            )
+        }.toMap()
 }

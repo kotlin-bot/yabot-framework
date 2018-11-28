@@ -7,9 +7,10 @@ import org.slf4j.LoggerFactory
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import kotlin.reflect.KClass
 
-class DynamicScope<S> constructor(
-    private val scopeClass: Class<S>,
+class DynamicScope<S : Any> constructor(
+    private val scopeClass: KClass<S>,
     private val classPropMap: ClassPropMap,
     private val callContext: CallContext,
     private val servicesRegistry: ServiceRegistry,
@@ -20,7 +21,7 @@ class DynamicScope<S> constructor(
     fun asScope(): S {
         return Proxy.newProxyInstance(
             ScopeFactory::class.java.classLoader,
-            arrayOf(scopeClass),
+            arrayOf(scopeClass.java),
             this::proxyCallHandler
         ) as S
     }
@@ -44,13 +45,14 @@ class DynamicScope<S> constructor(
                 return "Scope ${scopeClass.simpleName} [user=$chatId\nBot+Intent Props:${values}"
             }
         } else {
+
             val (methodType, propName) = methodNameToPropName(method)
             return when (methodType) {
                 MethodType.SETTER -> values[propName] = args?.firstOrNull()
                 MethodType.GETTER -> {
-                    val (type, resultClass) = classPropMap[propName]!!
-                    if (type == PropType.VARIABLE)
-                        return loadAndTransformProp(propName, resultClass)
+                    val (propType, _, nullable, resultClass) = classPropMap[propName]!!
+                    if (propType == PropType.VARIABLE)
+                        return loadAndTransformProp(propName, nullable, resultClass)
                     else {
                         val service = servicesRegistry.getOrNull(resultClass)
                         if (service == null)
@@ -65,8 +67,8 @@ class DynamicScope<S> constructor(
         }
     }
 
-    private fun loadAndTransformProp(propName: String, resultClass: Class<*>): Any? {
-        return values[propName] ?: mabyWeCanProvideDefaultValues(resultClass)
+    private fun loadAndTransformProp(propName: String, nullable: Boolean, resultClass: Class<*>): Any? {
+        return values[propName] ?: if (nullable) null else mabyWeCanProvideDefaultValues(resultClass)
     }
 
     private fun mabyWeCanProvideDefaultValues(resultClass: Class<*>): Any? {

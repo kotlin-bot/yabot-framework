@@ -2,6 +2,7 @@ package org.kotlinbot.scope
 
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.kotlinbot.tests.dynamicScopeFor
 import org.kotlinbot.tests.scopeFor
@@ -54,5 +55,13 @@ class ScopeFactoryTest {
         assertEquals(scope.intParam, values[Scope1::intParam.name])
         assertEquals(scope.stringParam, values[Scope1::stringParam.name])
         assertEquals(scope.longParam, values[Scope1::longParam.name])
+    }
+
+    @Test
+    fun `returns null on absent value for nullableField`() {
+        val (dynScope, services) = dynamicScopeFor<Scope1>(emptyMap())
+        val scope = dynScope.asScope()
+
+        assertNull(scope.nullableString)
     }
 }

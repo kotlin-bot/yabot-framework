@@ -21,7 +21,7 @@ class BotShell(
     }
 
     val commonPropNames = commonPropNames(
-        handlers.map { it.scopeClasss }.toTypedArray(),
+        handlers.map { it.scopeClasss.java }.toTypedArray(),
         classProps(Scope::class.java),
         Scope::class.java
     )

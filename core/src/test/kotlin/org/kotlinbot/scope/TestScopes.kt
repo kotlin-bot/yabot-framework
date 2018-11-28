@@ -7,6 +7,7 @@ interface Scope1 : BotScope {
     var booleanParam: Boolean
     var intParam: Int
     var longParam: Long
+    var nullableString: String?
 }
 
 interface Scope2 : BotScope {

@@ -1,9 +1,6 @@
 package org.kotlinbot.core.platform.scope
 
-import org.kotlinbot.api.BotScope
-import org.kotlinbot.api.IntentId
-import org.kotlinbot.api.ReplyService
-import org.kotlinbot.api.UserProfile
+import org.kotlinbot.api.*
 import org.kotlinbot.api.inevents.ChatId
 import org.kotlinbot.api.inevents.MessageId
 import org.kotlinbot.api.inevents.UserId
@@ -18,6 +15,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
 
 data class CallContext(
+    override val botId: BotId,
     override val chatId: ChatId,
     override val userId: UserId,
     override val profile: UserProfile,
