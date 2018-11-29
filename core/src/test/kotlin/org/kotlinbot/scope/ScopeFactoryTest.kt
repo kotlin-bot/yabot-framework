@@ -3,6 +3,7 @@ package org.kotlinbot.scope
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
+import org.kotlinbot.api.ONLY_BOT
 import org.kotlinbot.tests.dynamicScopeFor
 import org.kotlinbot.tests.scopeFor
 
@@ -76,9 +77,15 @@ class ScopeFactoryTest {
     @Test
     fun `correct work with generic collection types`() {
         val (dynScope, services) = dynamicScopeFor<Scope1>(emptyMap())
-        val someServiceImpl = SomeServiceImpl()
         val scope = dynScope.asScope()
         assertTrue(scope.mutableSet is MutableSet)
         assertTrue(scope.immutableSet is Set)
+    }
+
+    @Test
+    fun `correct return props from bot own scope`() {
+        val (dynScope, services) = dynamicScopeFor<Scope1>(emptyMap())
+        val scope = dynScope.asScope()
+        assertEquals(ONLY_BOT, scope.botId)
     }
 }

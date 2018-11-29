@@ -32,7 +32,8 @@ class DynamicScope<S : Any> constructor(
 
     @Throws(DispatchException::class)
     private fun proxyCallHandler(proxy: Any?, method: Method?, args: Array<out Any>?): Any? {
-        if (SCOPE_OWN_METHODS.contains(method!!.name)) {
+        val (methodType, propName) = methodNameToPropName(method!!)
+        if (SCOPE_OWN_METHODS.contains(propName)) {
             //делегируем вызов callContext
             try {
                 return method.invoke(callContext, *(args ?: emptyArray()))
@@ -49,8 +50,6 @@ class DynamicScope<S : Any> constructor(
                 return "Scope ${scopeClass.simpleName} [user=$chatId\nBot+Intent Props:${values}"
             }
         } else {
-
-            val (methodType, propName) = methodNameToPropName(method)
             return when (methodType) {
                 MethodType.SETTER -> values[propName] = args?.firstOrNull()
                 MethodType.GETTER -> {
