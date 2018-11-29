@@ -1,8 +1,7 @@
 package org.kotlinbot.scope
 
 import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 import org.kotlinbot.tests.dynamicScopeFor
 import org.kotlinbot.tests.scopeFor
@@ -72,5 +71,14 @@ class ScopeFactoryTest {
         services[SomeService::class.java] = someServiceImpl
         val scope = dynScope.asScope()
         assertEquals(someServiceImpl, scope.someService)
+    }
+
+    @Test
+    fun `correct work with generic collection types`() {
+        val (dynScope, services) = dynamicScopeFor<Scope1>(emptyMap())
+        val someServiceImpl = SomeServiceImpl()
+        val scope = dynScope.asScope()
+        assertTrue(scope.mutableSet is MutableSet)
+        assertTrue(scope.immutableSet is Set)
     }
 }

@@ -13,6 +13,8 @@ interface Scope1 : BotScope {
     var longParam: Long
     var nullableString: String?
     val someService: SomeService
+    var mutableSet: MutableSet<String>
+    var immutableSet: Set<String>
 }
 
 interface Scope2 : BotScope {

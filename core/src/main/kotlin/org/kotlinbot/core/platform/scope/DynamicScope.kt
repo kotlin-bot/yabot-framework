@@ -8,6 +8,10 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.javaType
 
 class DynamicScope<S : Any> constructor(
     private val scopeClass: KClass<S>,
@@ -54,7 +58,7 @@ class DynamicScope<S : Any> constructor(
                     if (propType == PropType.VARIABLE)
                         return loadAndTransformProp(propName, nullable, resultClass)
                     else {
-                        val service = servicesRegistry.getOrNull(resultClass)
+                        val service = servicesRegistry.getOrNull(resultClass.javaType as Class<*>)
                         if (service == null)
                             log.warn("\nNo service registred for class ${resultClass}::${propName}")
 
@@ -67,20 +71,30 @@ class DynamicScope<S : Any> constructor(
         }
     }
 
-    private fun loadAndTransformProp(propName: String, nullable: Boolean, resultClass: Class<*>): Any? {
-        return values[propName] ?: if (nullable) null else mabyWeCanProvideDefaultValues(resultClass)
+    private fun loadAndTransformProp(propName: String, nullable: Boolean, resultClass: KType): Any? {
+        return values[propName] ?: if (nullable) null else maybeWeCanProvideDefaultValues(resultClass)
     }
 
-    private fun mabyWeCanProvideDefaultValues(resultClass: Class<*>): Any? {
-        return when (resultClass) {
-            Boolean::class.java -> false
-            String::class.java -> ""
-            Int::class.java -> 0.toInt()
-            Byte::class.java -> 0.toByte()
-            Short::class.java -> 0.toShort()
-            Long::class.java -> 0.toLong()
-            Double::class.java -> 0.toDouble()
-            Float::class.java -> 0.toFloat()
+    private fun maybeWeCanProvideDefaultValues(resultType: KType): Any? {
+        //resultType.isSubtypeOf(Collection::class.starProjectedType)
+        return when {
+            resultType.isSubtypeOf(MutableSet::class.starProjectedType) -> HashSet<Any>()
+            resultType.isSubtypeOf(Set::class.starProjectedType) -> emptySet<Any>()
+
+            resultType.isSubtypeOf(MutableList::class.starProjectedType) -> ArrayList<Any>()
+            resultType.isSubtypeOf(List::class.starProjectedType) -> emptyList<Any>()
+
+            resultType.isSubtypeOf(MutableMap::class.starProjectedType) -> HashMap<Any, Any?>()
+            resultType.isSubtypeOf(Map::class.starProjectedType) -> emptyMap<Any, Any?>()
+
+            resultType.javaType == Boolean::class.java -> false
+            resultType.javaType == String::class.java -> ""
+            resultType.javaType == Int::class.java -> 0.toInt()
+            resultType.javaType == Byte::class.java -> 0.toByte()
+            resultType.javaType == Short::class.java -> 0.toShort()
+            resultType.javaType == Long::class.java -> 0.toLong()
+            resultType.javaType == Double::class.java -> 0.toDouble()
+            resultType.javaType == Float::class.java -> 0.toFloat()
             else -> null
         }
     }
