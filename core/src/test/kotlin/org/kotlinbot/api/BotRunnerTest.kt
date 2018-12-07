@@ -19,6 +19,7 @@ internal val intent1 = CommonScope::handler1.name
 internal val intent2 = CommonScope::handler2.name
 internal val intent3 = Handler3Scope::handler3.name
 internal val intent4 = CommonScope::handler4.name
+internal val intent5 = "intent5"
 
 class BotRunnerTest {
 
@@ -175,6 +176,18 @@ class BotRunnerTest {
             assertEquals("Must send only one callback reply", 1, runner.messages.count { it is CallbackReply })
         }
 
+    @Test
+    fun `active intent must be finished when we call finish() in onelect phase from another intent`() =
+        runBlocking {
+            runner("")
+            assertEquals(intent1, runner.activeIntentId)
+            runner("2")
+            assertEquals(intent2, runner.activeIntentId)
+            runner("exit")
+            assertEquals(intent1, runner.activeIntentId)
+
+        }
+
 }
 
 private fun assembleBotHandlers(): List<IntentEventHandler> {
@@ -204,6 +217,13 @@ private fun assembleBotHandlers(): List<IntentEventHandler> {
                 onElect = anyOf(
                     onText("4", block = startIntent()),
                     onText("interrupt", block = startIntent())
+                )
+            )
+        ),
+        intentHandlerOf(
+            intent5, fromHandler<CommonScope>(
+                onElect = anyOf(
+                    onText("exit", block = { finish() })
                 )
             )
         )
@@ -263,7 +283,10 @@ private suspend fun CommonScope.handler2(e: InEvent) {
     if (e.message == "finish") {
         handler2BeforeFinish = true
         finish()
+    } else {
+        otherwise()
     }
+
 }
 
 private suspend fun Handler3Scope.handler3(e: InEvent) {

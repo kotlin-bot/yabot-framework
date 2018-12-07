@@ -62,7 +62,9 @@ inline fun <reified SCOPE : BotScope> dynamicScopeFor(
         messageId = MessageId.testItem(),
         selfIntentId = "TestIntent1",
         serviceRegistry = serviceRegistry,
-        otherwiseHandler = {}
+        otherwiseHandler = {},
+        activeIntentId = "TestIntent1"
+
     )
 
     return s.createDynamicScope(SCOPE::class, callContext, serviceRegistry, values) to serviceRegistry

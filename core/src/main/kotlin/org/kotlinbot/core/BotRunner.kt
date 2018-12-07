@@ -39,15 +39,9 @@ open class BotRunner(
         joinedServiceRegistry[ReplyMethods::class.java] = replyStore
         val botState: BotState = resolveUserProfileIfNeed(getBotStateForUser(userId), event)
 
-        val callArguments = CallArguments(
-            event = event,
-            serviceRegistry = joinedServiceRegistry,
-            botState = botState
-        )
-
         logger.debug("Call stack before: {}", botState.callStack)
         logger.debug("Activity history before: {}", botState.activityHistory)
-        val (method, intentId) = if (event is Callback) {
+        val (method, intentId: IntentId?) = if (event is Callback) {
             botShell.handlers
                 .firstOrNull { it.callbackPrefixes.contains(event.stringData.substringBefore("|")) }
                 ?.let { ON_CALLBACK to it.intentId } ?: null to null
@@ -63,6 +57,14 @@ open class BotRunner(
         }
 
         if (intentId != null && method != null) {
+
+            val callArguments = CallArguments(
+                event = event,
+                serviceRegistry = joinedServiceRegistry,
+                botState = botState,
+                activeIntentId = intentId
+            )
+
             botState.intentWasActivated(intentId)
             executeCall(
                 intentId,
@@ -98,7 +100,7 @@ open class BotRunner(
     }
 
     private suspend fun executeCall(
-        intentId: IntentId,
+        selfIntentId: IntentId,
         callArguments: CallArguments,
         methodSource: suspend (botScope: BotScope) -> EventHandler<BotScope>?,
         otherwiseHandler: suspend (block: suspend () -> Unit) -> Unit = createOtherwiseHandler(
@@ -110,15 +112,16 @@ open class BotRunner(
 
         val scope: DynamicScope<out BotScope> =
             createDynamicScope(
-                botState.botId,
-                callArguments.chatId,
-                callArguments.userId,
-                botState.userProfile,
-                callArguments.messageId,
-                intentId,
-                callArguments.serviceRegistry,
-                botState.intentState(intentId),
-                otherwiseHandler
+                botId = botState.botId,
+                chatId = callArguments.chatId,
+                userId = callArguments.userId,
+                userProfile = botState.userProfile,
+                messageId = callArguments.messageId,
+                selfIntentId = selfIntentId,
+                activeIntentId = callArguments.activeIntentId,
+                joinedServiceRegistry = callArguments.serviceRegistry,
+                values = botState.intentState(selfIntentId),
+                otherwiseHandler = otherwiseHandler
             )
         try {
 
@@ -126,7 +129,7 @@ open class BotRunner(
             val method = methodSource(botScope)
             return if (method != null) {
                 method.invoke(botScope, callArguments.event)
-                applyScopeChanges(botState, scope.values, intentId)
+                applyScopeChanges(botState, scope.values, selfIntentId)
                 true
             } else {
                 false
@@ -148,11 +151,11 @@ open class BotRunner(
                 callIntentMethod(e.startIntentId!!, ON_START, callArguments)
 
             } else {
-                if (e.finishIntentId != null) {
+                if (e.finishIntentId != null && e.finishIntentId != botShell.handlers.first().intentId) {
                     botState.finishActiveIntent()
                     applyScopeChanges(botState, scope.values)
                 } else {
-                    applyScopeChanges(botState, scope.values, intentId)
+                    applyScopeChanges(botState, scope.values, selfIntentId)
                 }
 
 
@@ -215,10 +218,10 @@ open class BotRunner(
                         return@firstOrNull false
 
                     executeCall(
-                        handler.intentId,
-                        callArguments,
-                        electMethod(handler.intentId, callArguments.event),
-                        createRejectOtherwiseHandler()
+                        selfIntentId = handler.intentId,
+                        callArguments = callArguments,
+                        methodSource = electMethod(handler.intentId, callArguments.event),
+                        otherwiseHandler = createRejectOtherwiseHandler()
                     )
                 }
             if (intentToActivate == null) {
@@ -264,7 +267,8 @@ open class BotRunner(
         userId: UserId,
         userProfile: UserProfile,
         messageId: MessageId? = null,
-        intentId: IntentId,
+        selfIntentId: IntentId,
+        activeIntentId: IntentId,
         joinedServiceRegistry: ServiceRegistry = commonServiceRegistry,
         values: Map<String, Any?>,
         otherwiseHandler: suspend (block: suspend () -> Unit) -> Unit
@@ -276,14 +280,15 @@ open class BotRunner(
             userId = userId,
             profile = userProfile,
             messageId = messageId,
-            selfIntentId = intentId,
+            selfIntentId = selfIntentId,
+            activeIntentId = activeIntentId,
             serviceRegistry = joinedServiceRegistry,
             otherwiseHandler = otherwiseHandler
         )
 
 
         return scopeFactory.createDynamicScope(
-            getIntentById(intentId).scopeClasss as KClass<T>,
+            getIntentById(selfIntentId).scopeClasss as KClass<T>,
             callContext,
             joinedServiceRegistry,
             values
@@ -307,7 +312,8 @@ open class BotRunner(
 private data class CallArguments(
     val event: InEvent,
     val botState: BotState,
-    val serviceRegistry: ServiceRegistry
+    val serviceRegistry: ServiceRegistry,
+    val activeIntentId: IntentId
 
 ) {
     val userId: UserId = botState.userId

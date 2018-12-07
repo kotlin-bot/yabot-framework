@@ -21,6 +21,8 @@ data class CallContext(
     override val profile: UserProfile,
     override val messageId: MessageId?,
     override val selfIntentId: IntentId,
+    override val activeIntentId: IntentId,
+
     private val serviceRegistry: ServiceRegistry,
     private val otherwiseHandler: suspend (block: suspend () -> Unit) -> Unit
 ) : BotScope,

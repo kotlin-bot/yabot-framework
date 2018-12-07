@@ -6,6 +6,7 @@ import org.kotlinbot.api.inevents.MessageId
 import org.kotlinbot.api.inevents.Text
 import org.kotlinbot.api.inevents.TextKind
 import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.outevents.TextMessage
 import org.kotlinbot.core.BotRunner
 import org.kotlinbot.core.BotShell
 
@@ -31,7 +32,8 @@ class TestBotRunnerWrapper(botShell: BotShell) :
             userId = userId,
             chatId = userId,
             userProfile = botState.userProfile,
-            intentId = intentId,
+            selfIntentId = intentId,
+            activeIntentId = intentId,
             values = botState.intentState(intentId),
             otherwiseHandler = {}
         ).asScope()
@@ -50,6 +52,12 @@ class TestBotRunnerWrapper(botShell: BotShell) :
         get () = runBlocking {
             getBotStateForUser(UserId.testItem()).activeIntentId()
         }
+
+    fun fetchMessagesText(): List<String> {
+        val result = messages.filterIsInstance(TextMessage::class.java).map { it.text }
+        messages.clear()
+        return result
+    }
 }
 
 fun text(str: String, userId: UserId = UserId.testItem()) = Text(
