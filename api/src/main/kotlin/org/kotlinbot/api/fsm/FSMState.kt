@@ -7,7 +7,7 @@ typealias FSMStateId = String
 interface FSMState<SCOPE : FSMIntentScope> {
     val stateId: FSMStateId get() = javaClass.simpleName
 
-    suspend fun SCOPE.ask(event: InEvent?) {}
+    suspend fun SCOPE.ask(event: InEvent? = null) {}
     suspend fun SCOPE.handleReply(event: InEvent) {}
 
     @Throws(SwitchStateException::class)
