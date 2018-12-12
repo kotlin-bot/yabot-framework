@@ -9,7 +9,6 @@ import name.alatushkin.api.vk.api.utils.upload.uploadMessagePhoto
 import name.alatushkin.api.vk.generated.messages.*
 import name.alatushkin.api.vk.generated.messages.methods.MessagesSendMethod
 import name.alatushkin.api.vk.generated.messages.methods.MessagesSetActivityMethod
-import name.alatushkin.httpclient.httpClient
 import org.kotlinbot.api.ReplyService
 import org.kotlinbot.api.inevents.MessageId
 import org.kotlinbot.api.outevents.*
@@ -17,6 +16,8 @@ import org.kotlinbot.api.outevents.Keyboard
 import org.kotlinbot.connectors.vk.longpoll.VkChatId
 import org.kotlinbot.connectors.vk.longpoll.VkId
 import org.kotlinbot.connectors.vk.longpoll.VkMessageId
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.lang.Long.max
 import kotlin.random.Random
 
@@ -24,8 +25,6 @@ class VkReplyService(
     val groupId: String,
     val vkMethodExutor: MethodExecutorWithException
 ) : ReplyService {
-    val httpClient = httpClient(3000, 5000)
-
 
     override suspend fun invoke(outEvent: OutEvent): MessageId? {
 
@@ -36,6 +35,10 @@ class VkReplyService(
             is CallbackReply -> null
             else -> error("Unknonwn to convet type")
         }
+    }
+
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(VkReplyService::class.java)
     }
 }
 
@@ -130,19 +133,30 @@ fun toVkKeyboard(keyboard: Keyboard?): name.alatushkin.api.vk.generated.messages
 
     return KeyboardImpl(
         oneTime = keyboard.oneTime,
-        buttons = keyboard.buttons.map { row ->
-            row.map { btn ->
-                val buttonAction = KeyboardButtonAction(
-                    type = KeyboardButtonActionType.TEXT,
-                    label = btn.label,
-                    payload = if (btn is CallbackButton) "\"${btn.data}\"" else null
-                )
+        buttons = keyboard.buttons.mapIndexedNotNull { rowIdx, row ->
+            if (rowIdx < 10) {
+                row.mapIndexedNotNull { colIdx, btn ->
+                    if (colIdx < 4) {
+                        val buttonAction = KeyboardButtonAction(
+                            type = KeyboardButtonActionType.TEXT,
+                            label = btn.label,
+                            payload = if (btn is CallbackButton) "\"${btn.data}\"" else null
+                        )
 
-                KeyboardButton(
-                    color = KeyboardButtonColor.DEFAULT,
-                    action = buttonAction
-                )
-            }.toTypedArray()
+                        KeyboardButton(
+                            color = KeyboardButtonColor.DEFAULT,
+                            action = buttonAction
+                        )
+                    } else {
+                        VkReplyService.logger.warn("Key idx {} {} was ignored in VK", colIdx, btn.label)
+                        null
+                    }
+                }.toTypedArray()
+            } else {
+                VkReplyService.logger.warn("Row ow keyboard idx {}  was ignored in VK {}", rowIdx, row)
+                null
+            }
+
         }.toTypedArray()
     )
 }
