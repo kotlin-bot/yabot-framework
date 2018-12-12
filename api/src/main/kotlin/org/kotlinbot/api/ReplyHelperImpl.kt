@@ -42,6 +42,7 @@ data class ReplyHelperImpl(val callScope: BotScope, val inEvent: InEvent?) :
     override suspend fun textOtherwise(action: suspend (textMsg: Text) -> Unit) {
         if (!matched && msg is Text) {
             callScope.otherwise { action(msg) }
+            matched = true
         }
     }
 

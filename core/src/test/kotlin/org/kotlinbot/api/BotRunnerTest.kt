@@ -185,6 +185,14 @@ class BotRunnerTest {
             assertEquals(intent2, runner.activeIntentId)
             runner("exit")
             assertEquals(intent1, runner.activeIntentId)
+            assertTrue(
+                "on return must be called after finish another intent in elect phase",
+                runner.intentScope<CommonScope>(intent1).handler1Return
+            )
+            assertFalse(
+                "otherwise block must not be called when intent switch occurs in onelect phase handlers",
+                runner.intentScope<CommonScope>(intent2).handler2OtherwiseWasCalled
+            )
 
         }
 
@@ -243,6 +251,7 @@ private interface CommonScope : BotScope {
     var handler2Done: Boolean
     var handler2startEventText: String
     var handler2BeforeFinish: Boolean
+    var handler2OtherwiseWasCalled: Boolean
 
 
     var handler3Called: Boolean
@@ -283,8 +292,12 @@ private suspend fun CommonScope.handler2(e: InEvent) {
     if (e.message == "finish") {
         handler2BeforeFinish = true
         finish()
+    } else if (e.message == "2") {
+        //ignore
     } else {
-        otherwise()
+        otherwise {
+            handler2OtherwiseWasCalled = true
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import org.kotlinbot.api.inevents.UserId
 import org.kotlinbot.api.outevents.TextMessage
 import org.kotlinbot.core.BotRunner
 import org.kotlinbot.core.BotShell
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 class TestBotRunnerWrapper(botShell: BotShell) :
@@ -35,7 +36,8 @@ class TestBotRunnerWrapper(botShell: BotShell) :
             selfIntentId = intentId,
             activeIntentId = intentId,
             values = botState.intentState(intentId),
-            otherwiseHandler = {}
+            otherwiseHandler = {},
+            otherwiseWasCalled = AtomicBoolean(false)
         ).asScope()
     }
 

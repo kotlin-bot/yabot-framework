@@ -10,6 +10,7 @@ import org.kotlinbot.core.ServiceRegistry
 import org.kotlinbot.core.platform.scope.CallContext
 import org.kotlinbot.core.platform.scope.DynamicScope
 import org.kotlinbot.core.platform.scope.ScopeFactory
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.random.Random
 
 //const val TEST_BOT_ID_1: BotId = "test-bot-1"
@@ -63,8 +64,8 @@ inline fun <reified SCOPE : BotScope> dynamicScopeFor(
         selfIntentId = "TestIntent1",
         serviceRegistry = serviceRegistry,
         otherwiseHandler = {},
-        activeIntentId = "TestIntent1"
-
+        activeIntentId = "TestIntent1",
+        otherWiseCalled = AtomicBoolean(false)
     )
 
     return s.createDynamicScope(SCOPE::class, callContext, serviceRegistry, values) to serviceRegistry

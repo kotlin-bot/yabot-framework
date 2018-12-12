@@ -22,6 +22,7 @@ data class CallContext(
     override val messageId: MessageId?,
     override val selfIntentId: IntentId,
     override val activeIntentId: IntentId,
+    val otherWiseCalled: AtomicBoolean,
 
     private val serviceRegistry: ServiceRegistry,
     private val otherwiseHandler: suspend (block: suspend () -> Unit) -> Unit
@@ -33,8 +34,6 @@ data class CallContext(
         messageId,
         serviceRegistry[ReplyService::class.java]
     ) {
-
-    val otherWiseCalled = AtomicBoolean()
 
     override suspend fun otherwise(block: suspend () -> Unit) {
         if (!otherWiseCalled.getAndSet(true)) {
@@ -48,7 +47,11 @@ data class CallContext(
                     throw e
             }
         } else {
-            logger.warn("Recursive otherwise calling at intent {}. Dont ask other intents", selfIntentId)
+            logger.warn(
+                "Recursive otherwise calling at intent self:{},active:{}. Dont ask other intents",
+                selfIntentId,
+                activeIntentId
+            )
             block()
         }
     }

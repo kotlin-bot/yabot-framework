@@ -13,6 +13,7 @@ import org.kotlinbot.core.platform.scope.DynamicScope
 import org.kotlinbot.core.platform.scope.ScopeFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
 
 open class BotRunner(
@@ -121,7 +122,8 @@ open class BotRunner(
                 activeIntentId = callArguments.activeIntentId,
                 joinedServiceRegistry = callArguments.serviceRegistry,
                 values = botState.intentState(selfIntentId),
-                otherwiseHandler = otherwiseHandler
+                otherwiseHandler = otherwiseHandler,
+                otherwiseWasCalled = callArguments.otherwiseWasCalled
             )
         try {
 
@@ -228,6 +230,7 @@ open class BotRunner(
                 block()
             } else {
                 callArguments.botState.intentWasActivated(intentToActivate.intentId)
+                //throw DispatchException(,startIntentId = intentToActivate.intentId)
             }
 
         }
@@ -271,7 +274,8 @@ open class BotRunner(
         activeIntentId: IntentId,
         joinedServiceRegistry: ServiceRegistry = commonServiceRegistry,
         values: Map<String, Any?>,
-        otherwiseHandler: suspend (block: suspend () -> Unit) -> Unit
+        otherwiseHandler: suspend (block: suspend () -> Unit) -> Unit,
+        otherwiseWasCalled: AtomicBoolean
     ): DynamicScope<T> {
 
         val callContext = CallContext(
@@ -283,7 +287,8 @@ open class BotRunner(
             selfIntentId = selfIntentId,
             activeIntentId = activeIntentId,
             serviceRegistry = joinedServiceRegistry,
-            otherwiseHandler = otherwiseHandler
+            otherwiseHandler = otherwiseHandler,
+            otherWiseCalled = otherwiseWasCalled
         )
 
 
@@ -313,7 +318,8 @@ private data class CallArguments(
     val event: InEvent,
     val botState: BotState,
     val serviceRegistry: ServiceRegistry,
-    val activeIntentId: IntentId
+    val activeIntentId: IntentId,
+    val otherwiseWasCalled: AtomicBoolean = AtomicBoolean(false)
 
 ) {
     val userId: UserId = botState.userId
