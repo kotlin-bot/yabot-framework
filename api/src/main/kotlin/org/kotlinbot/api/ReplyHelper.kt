@@ -8,6 +8,7 @@ typealias ReplyCondition<T> = suspend (InEvent?) -> T?
 interface ReplyHelper {
     suspend fun <T, E : InEvent> on(predicate: ReplyCondition<T>, action: suspend (event: E, T) -> Unit)
 
+    suspend fun onText(action: suspend (textMsg: Text) -> Unit)
     suspend fun onText(predicate: suspend (String) -> Boolean, action: suspend (textMsg: Text) -> Unit)
     suspend fun <T> onText(predicate: suspend (String) -> T?, action: suspend (textMsg: Text, T) -> Unit)
     suspend fun onText(regexpMatch: Regex, action: suspend (textMsg: Text, matches: MatchResult) -> Unit)

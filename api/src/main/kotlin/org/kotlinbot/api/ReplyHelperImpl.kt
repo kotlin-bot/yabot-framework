@@ -19,6 +19,10 @@ data class ReplyHelperImpl(val callScope: BotScope, val inEvent: InEvent?) :
             execute(action)
     }
 
+    override suspend fun onText(action: suspend (textMsg: Text) -> Unit) {
+        if (!matched && msg is Text)
+            execute(action)
+    }
 
     override suspend fun <T> onText(predicate: suspend (String) -> T?, action: suspend (textMsg: Text, T) -> Unit) {
         if (!matched && msg is Text)
