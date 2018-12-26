@@ -8,7 +8,6 @@ import name.alatushkin.api.vk.api.utils.upload.uploadMessageDocument
 import name.alatushkin.api.vk.api.utils.upload.uploadMessagePhoto
 import name.alatushkin.api.vk.generated.messages.*
 import name.alatushkin.api.vk.generated.messages.methods.MessagesSendMethod
-import name.alatushkin.api.vk.generated.messages.methods.MessagesSetActivityMethod
 import org.kotlinbot.api.ReplyService
 import org.kotlinbot.api.inevents.MessageId
 import org.kotlinbot.api.outevents.*
@@ -105,14 +104,6 @@ suspend fun convertAndSendText(
 
     val pause = max(300, textMessage.text.length * 1000 / 100 / 60.toLong())
     delay(pause)
-
-    api(
-        MessagesSetActivityMethod(
-            peerId = chatId.id,
-            type = "",
-            groupId = senderId.toLong()
-        )
-    )
 
     val messageId = api.invoke(
         MessagesSendMethod(
