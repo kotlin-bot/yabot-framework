@@ -47,12 +47,14 @@ data class Keyboard(
 
 }
 
-sealed class Button(open val label: String)
+sealed class Button {
+    abstract val label: String
+}
 
-data class TextButton(override val label: String) : Button(label)
-data class CallbackButton(override val label: String, val data: String) : Button(label)
-data class LocationButton(override val label: String) : Button(label)
-data class OpenUrlButton(override val label: String, val url: String) : Button(label)
+data class TextButton(override val label: String) : Button()
+data class CallbackButton(override val label: String, val data: String) : Button()
+data class LocationButton(override val label: String) : Button()
+data class OpenUrlButton(override val label: String, val url: String) : Button()
 
 val HIDE_KEYBOARD = Keyboard()
 

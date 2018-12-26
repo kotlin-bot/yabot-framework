@@ -9,11 +9,15 @@ import org.kotlinbot.api.inevents.UserId
 import org.kotlinbot.api.outevents.TextMessage
 import org.kotlinbot.core.BotRunner
 import org.kotlinbot.core.BotShell
+import org.kotlinbot.core.BotStateRepository
 import java.util.concurrent.atomic.AtomicBoolean
 
 
-class TestBotRunnerWrapper(botShell: BotShell) :
-    BotRunner(botShell = botShell, botStateRepository = BotStateRepositoryInMemoryImpl()) {
+class TestBotRunnerWrapper(
+    botShell: BotShell,
+    botStateRepository: BotStateRepository = BotStateRepositoryInMemoryImpl()
+) :
+    BotRunner(botShell = botShell, botStateRepository = botStateRepository) {
 
     private val replyService = DummyReplyService()
 

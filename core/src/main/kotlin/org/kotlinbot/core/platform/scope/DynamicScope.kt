@@ -1,5 +1,6 @@
 package org.kotlinbot.core.platform.scope
 
+import org.kotlinbot.api.fsm.GoToStateException
 import org.kotlinbot.api.methods.DispatchException
 import org.kotlinbot.core.ServiceRegistry
 import org.slf4j.Logger
@@ -30,7 +31,7 @@ class DynamicScope<S : Any> constructor(
         ) as S
     }
 
-    @Throws(DispatchException::class)
+    @Throws(DispatchException::class, GoToStateException::class)
     private fun proxyCallHandler(proxy: Any?, method: Method?, args: Array<out Any>?): Any? {
         val (methodType, propName) = methodNameToPropName(method!!)
         if (SCOPE_OWN_METHODS.contains(propName)) {
@@ -39,6 +40,8 @@ class DynamicScope<S : Any> constructor(
                 return method.invoke(callContext, *(args ?: emptyArray()))
             } catch (e: InvocationTargetException) {
                 if (e.targetException is DispatchException)
+                    throw e.targetException
+                else if (e.targetException is GoToStateException)
                     throw e.targetException
                 else {
                     log.error("Error while calling scopewide intentMethod {}", method.name, e)

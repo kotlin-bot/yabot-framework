@@ -1,6 +1,7 @@
 package org.kotlinbot.runner
 
 import com.mongodb.async.client.MongoDatabase
+import com.mongodb.client.model.ReplaceOptions
 import kotlinx.coroutines.runBlocking
 import org.kotlinbot.api.BotId
 import org.kotlinbot.api.BotState
@@ -31,7 +32,11 @@ class BotStateRepositoryMongoImpl(db: MongoDatabase) : BotStateRepository {
     }
 
     override suspend fun set(botId: BotId, userId: UserId, botState: BotState) {
-        col.replaceOne(and(BotState::botId eq botId, BotState::userId eq userId), botState)
+        col.replaceOne(
+            and(BotState::botId eq botId, BotState::userId eq userId),
+            botState,
+            ReplaceOptions().upsert(true)
+        )
     }
 
     override suspend fun allStates(botId: BotId): List<BotState> {

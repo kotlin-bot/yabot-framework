@@ -18,10 +18,14 @@ import org.kotlinbot.connectors.vk.VkReplyService
 import org.kotlinbot.connectors.vk.longpoll.VkLongPoller
 import org.kotlinbot.core.BotRunner
 import org.kotlinbot.core.BotShell
+import org.kotlinbot.core.BotStateRepository
 
 import kotlin.concurrent.thread
 
-class SimpleBotRunner(val botShell: BotShell) {
+class SimpleBotRunner(
+    val botShell: BotShell,
+    val stateRepository: BotStateRepository = BotStateRepositoryInMemoryImpl()
+) {
     private val profileResolvers = HashMap<Origin, ProfileResolver>()
     private val replyServices = HashMap<Origin, ReplyService>()
     private val attachmentResolvers = HashMap<Origin, AttachmentResolver>()
@@ -31,7 +35,7 @@ class SimpleBotRunner(val botShell: BotShell) {
     init {
         runner = BotRunner(
             botShell = botShell,
-            botStateRepository = BotStateRepositoryInMemoryImpl(),
+            botStateRepository = stateRepository,
             profileResolver = ProfileResolverRouter(
                 profileResolvers
             )
