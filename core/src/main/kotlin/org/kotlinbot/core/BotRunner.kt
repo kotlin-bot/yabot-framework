@@ -281,7 +281,7 @@ open class BotRunner(
         val callContext = CallContext(
             botId = botId,
             chatId = chatId,
-            userId = userId,
+            personId = userId,
             profile = personProfile,
             messageId = messageId,
             selfIntentId = selfIntentId,

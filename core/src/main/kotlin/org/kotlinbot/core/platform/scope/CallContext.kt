@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 data class CallContext(
     override val botId: BotId,
     override val chatId: ChatId,
-    override val userId: PersonId,
+    override val personId: PersonId,
     override val profile: PersonProfile,
     override val messageId: MessageId?,
     override val selfIntentId: IntentId,

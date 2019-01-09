@@ -58,7 +58,7 @@ inline fun <reified SCOPE : BotScope> dynamicScopeFor(
     val callContext = CallContext(
         botId = ONLY_BOT,
         chatId = ChatId.testItem(),
-        userId = PersonId.testItem(),
+        personId = PersonId.testItem(),
         profile = PersonProfile(PersonId.testItem()),
         messageId = MessageId.testItem(),
         selfIntentId = "TestIntent1",
