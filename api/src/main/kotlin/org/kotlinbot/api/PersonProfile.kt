@@ -1,7 +1,7 @@
 package org.kotlinbot.api
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.inevents.PersonId
 import java.time.LocalDateTime
 import java.time.MonthDay
 
@@ -19,8 +19,8 @@ enum class CanSendMessage {
 
 data class ProfileValue<T>(val value: T, val source: Source)
 
-data class UserProfile(
-    val userId: UserId,
+data class PersonProfile(
+    val personId: PersonId,
     val created: LocalDateTime = LocalDateTime.now(),
     val canSendMessage: CanSendMessage = CanSendMessage.UNKNOWN,
     val resolved: Boolean = false,

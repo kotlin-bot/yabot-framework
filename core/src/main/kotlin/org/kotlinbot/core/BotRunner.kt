@@ -28,7 +28,7 @@ open class BotRunner(
     override suspend fun invoke(event: InEvent) {
         val messageId = (event as? InMessage)?.messageId
         val chatId = event.chatId
-        val userId = event.userId
+        val userId = event.personId
         val replyStore = ReplyMethodsImpl(
             chatId,
             messageId
@@ -93,10 +93,10 @@ open class BotRunner(
     }
 
     private suspend fun resolveUserProfileIfNeed(botState: BotState, event: InEvent): BotState {
-        if (botState.userProfile.resolved)
+        if (botState.personProfile.resolved)
             return botState
         return profileResolver.resolveProfileFromEvent(event)?.let {
-            botState.copy(userProfile = it)
+            botState.copy(personProfile = it)
         } ?: botState
     }
 
@@ -116,7 +116,7 @@ open class BotRunner(
                 botId = botState.botId,
                 chatId = callArguments.chatId,
                 userId = callArguments.userId,
-                userProfile = botState.userProfile,
+                personProfile = botState.personProfile,
                 messageId = callArguments.messageId,
                 selfIntentId = selfIntentId,
                 activeIntentId = callArguments.activeIntentId,
@@ -262,13 +262,13 @@ open class BotRunner(
 
     internal fun getIntentById(intentId: IntentId) = botShell.handlers.find { it.intentId == intentId }!!
 
-    protected suspend fun getBotStateForUser(userId: UserId) = botStateRepository.get(ONLY_BOT, userId)
+    protected suspend fun getBotStateForUser(userId: PersonId) = botStateRepository.get(ONLY_BOT, userId)
 
     protected fun <T : BotScope> createDynamicScope(
         botId: BotId,
         chatId: ChatId,
-        userId: UserId,
-        userProfile: UserProfile,
+        userId: PersonId,
+        personProfile: PersonProfile,
         messageId: MessageId? = null,
         selfIntentId: IntentId,
         activeIntentId: IntentId,
@@ -282,7 +282,7 @@ open class BotRunner(
             botId = botId,
             chatId = chatId,
             userId = userId,
-            profile = userProfile,
+            profile = personProfile,
             messageId = messageId,
             selfIntentId = selfIntentId,
             activeIntentId = activeIntentId,
@@ -322,7 +322,7 @@ private data class CallArguments(
     val otherwiseWasCalled: AtomicBoolean = AtomicBoolean(false)
 
 ) {
-    val userId: UserId = botState.userId
+    val userId: PersonId = botState.userId
     val chatId: ChatId = event.chatId
     val messageId: MessageId? = (event as? InMessage)?.messageId
 }

@@ -5,7 +5,7 @@ import com.mongodb.client.model.ReplaceOptions
 import kotlinx.coroutines.runBlocking
 import org.kotlinbot.api.BotId
 import org.kotlinbot.api.BotState
-import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.inevents.PersonId
 import org.kotlinbot.core.BotStateRepository
 import org.litote.kmongo.and
 import org.litote.kmongo.async.getCollection
@@ -24,14 +24,14 @@ class BotStateRepositoryMongoImpl(db: MongoDatabase) : BotStateRepository {
         }
     }
 
-    override suspend fun get(botId: BotId, userId: UserId): BotState {
+    override suspend fun get(botId: BotId, userId: PersonId): BotState {
         return col.findOne(and(BotState::botId eq botId, BotState::userId eq userId)) ?: BotState(
             botId,
             userId
         )
     }
 
-    override suspend fun set(botId: BotId, userId: UserId, botState: BotState) {
+    override suspend fun set(botId: BotId, userId: PersonId, botState: BotState) {
         col.replaceOne(
             and(BotState::botId eq botId, BotState::userId eq userId),
             botState,

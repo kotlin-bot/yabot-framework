@@ -17,9 +17,9 @@ data class TgChatId(val id: Long) : ChatId {
         get() = Origin.TG
 }
 
-data class TgUserId(val id: Long, val isBot: Boolean) : UserId {
+data class TgUserId(val id: Long, val isBot: Boolean) : PersonId {
     override val kind: UserKind
-        get() = if (isBot) UserKind.BOT else UserKind.HUMAN
+        get() = if (isBot) UserKind.PUBLIC else UserKind.HUMAN
     override val origin: Origin
         get() = Origin.TG
 }

@@ -85,7 +85,7 @@ class TgLongPoller(
         return listOf(
             Callback(
                 messageId = messageId,
-                userId = userId,
+                personId = userId,
                 native = callbackQuery,
                 stringData = callbackQuery.data()
             )
@@ -103,7 +103,7 @@ class TgLongPoller(
                         message = message.text(),
                         kind = TextKind.UNKNOWN,
                         messageId = messageId,
-                        userId = userId,
+                        personId = userId,
                         chatId = chatId,
                         native = message
                     )
@@ -112,7 +112,7 @@ class TgLongPoller(
 
             message.photo() != null -> listOf(
                 Photos(
-                    userId = userId,
+                    personId = userId,
                     chatId = chatId,
                     native = message,
                     messageId = messageId,
@@ -122,7 +122,7 @@ class TgLongPoller(
 
             message.voice() != null -> listOf(
                 Voice(
-                    userId = userId,
+                    personId = userId,
                     chatId = chatId,
                     native = message,
                     messageId = messageId,
@@ -132,7 +132,7 @@ class TgLongPoller(
 
             message.location() != null -> listOf(
                 InLocation(
-                    userId = userId,
+                    personId = userId,
                     chatId = chatId,
                     native = message,
                     messageId = messageId,
@@ -148,7 +148,7 @@ class TgLongPoller(
 
             message.venue() != null -> listOf(
                 InLocation(
-                    userId = userId,
+                    personId = userId,
                     chatId = chatId,
                     native = message,
                     messageId = messageId,

@@ -16,7 +16,7 @@ data class VkChatId(override val id: Long) : ChatId,VkId {
         get() = Origin.VK
 }
 
-data class VkUserId(override val id: Long) : UserId,VkId {
+data class VkUserId(override val id: Long) : PersonId, VkId {
     override val kind: UserKind
         get() = if (id > 0) UserKind.HUMAN else UserKind.PUBLIC
 

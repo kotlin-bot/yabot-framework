@@ -50,7 +50,7 @@ class VkLongPoller(
     private fun convertMessageNew(inMessage: Message): List<InEvent> {
         val messageId: MessageId = VkMessageId(inMessage.id)
         val chatId: ChatId = VkChatId(inMessage.peerId)
-        val userId: UserId = VkUserId(inMessage.fromId)
+        val userId: PersonId = VkUserId(inMessage.fromId)
 
         val result = ArrayList<InEvent>()
         if (!inMessage.payload.isNullOrBlank()) {
@@ -58,7 +58,7 @@ class VkLongPoller(
                 Callback(
                     messageId = messageId,
                     stringData = inMessage.payload!!,
-                    userId = userId,
+                    personId = userId,
                     native = inMessage
                 )
             )
@@ -68,7 +68,7 @@ class VkLongPoller(
                     chatId = chatId,
                     messageId = messageId,
                     message = inMessage.text,
-                    userId = userId,
+                    personId = userId,
                     kind = TextKind.UNKNOWN,
                     native = inMessage
 
@@ -89,7 +89,7 @@ class VkLongPoller(
                 InLocation(
                     chatId = chatId,
                     messageId = messageId,
-                    userId = userId,
+                    personId = userId,
                     location = LocationAttachment(
                         origin = Origin.VK,
                         location = location,
@@ -116,7 +116,7 @@ class VkLongPoller(
                 Photos(
                     chatId = chatId,
                     messageId = messageId,
-                    userId = userId,
+                    personId = userId,
                     photos = attachments,
                     native = inMessage
                 )
@@ -136,7 +136,7 @@ class VkLongPoller(
             Voice(
                 chatId = chatId,
                 messageId = messageId,
-                userId = userId,
+                personId = userId,
                 voice = it,
                 native = inMessage
             )
@@ -154,7 +154,7 @@ class VkLongPoller(
                 File(
                     chatId = chatId,
                     messageId = messageId,
-                    userId = userId,
+                    personId = userId,
                     file = attachment,
                     native = inMessage
                 )

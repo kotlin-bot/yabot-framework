@@ -3,10 +3,10 @@ package org.kotlinbot.connectors.vk
 import name.alatushkin.api.vk.MethodExecutorWithException
 import name.alatushkin.api.vk.generated.common.Sex
 import name.alatushkin.api.vk.generated.users.methods.UsersGetMethod
+import org.kotlinbot.api.PersonProfile
 import org.kotlinbot.api.ProfileResolver
 import org.kotlinbot.api.ProfileValue
 import org.kotlinbot.api.Source
-import org.kotlinbot.api.UserProfile
 import org.kotlinbot.api.inevents.InEvent
 import org.kotlinbot.connectors.vk.longpoll.VkUserId
 import org.slf4j.Logger
@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory
 import java.time.MonthDay
 
 class VkProfileResolver(val api: MethodExecutorWithException) : ProfileResolver {
-    override suspend fun resolveProfileFromEvent(event: InEvent): UserProfile? {
+    override suspend fun resolveProfileFromEvent(event: InEvent): PersonProfile? {
         if (!event.origin.isVkontakte)
             return null
 
-        val userIdStr = (event.userId as VkUserId).id.toString()
+        val userIdStr = (event.personId as VkUserId).id.toString()
         try {
 
             val result = api(
@@ -29,8 +29,8 @@ class VkProfileResolver(val api: MethodExecutorWithException) : ProfileResolver 
             ).first()
 
             val value = result.sex
-            return UserProfile(
-                userId = event.userId,
+            return PersonProfile(
+                personId = event.personId,
                 birthDayValue = result.bdate?.let { fromProfile(MonthDay.of(it.month, it.day)) },
                 birthYearValue = result.bdate?.year?.let { fromProfile(it) },
                 firstNameValue = fromProfile(result.firstName),

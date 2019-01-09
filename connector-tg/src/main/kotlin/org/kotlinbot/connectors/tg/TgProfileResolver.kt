@@ -6,7 +6,7 @@ import org.kotlinbot.api.inevents.InEvent
 import org.kotlinbot.api.inevents.InMessage
 
 class TgProfileResolver : ProfileResolver {
-    override suspend fun resolveProfileFromEvent(event: InEvent): UserProfile? {
+    override suspend fun resolveProfileFromEvent(event: InEvent): PersonProfile? {
         if (!event.origin.isTelegram)
             return null
 
@@ -15,8 +15,8 @@ class TgProfileResolver : ProfileResolver {
 
         val from = (event.native as Message).from()
 
-        return UserProfile(
-            userId = TgUserId(from.id().toLong(), from.isBot),
+        return PersonProfile(
+            personId = TgUserId(from.id().toLong(), from.isBot),
             canSendMessage = CanSendMessage.YES,
             languageValue = ProfileValue(from.languageCode(), Source.PROFILE),
             firstNameValue = ProfileValue(from.firstName(), Source.PROFILE),

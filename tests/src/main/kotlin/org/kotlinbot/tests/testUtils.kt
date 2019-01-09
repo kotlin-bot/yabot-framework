@@ -3,8 +3,8 @@ package org.kotlinbot.tests
 
 import org.kotlinbot.api.BotScope
 import org.kotlinbot.api.ONLY_BOT
+import org.kotlinbot.api.PersonProfile
 import org.kotlinbot.api.ReplyService
-import org.kotlinbot.api.UserProfile
 import org.kotlinbot.api.inevents.*
 import org.kotlinbot.core.ServiceRegistry
 import org.kotlinbot.core.platform.scope.CallContext
@@ -23,12 +23,12 @@ data class TestMessageId(val id: Int = Random.nextInt()) : MessageId {
 
 fun MessageId.Companion.testItem() = TestMessageId()
 
-data class TestUserId(override val kind: UserKind, val id: Int = 1) : UserId {
+data class TestUserId(override val kind: UserKind, val id: Int = 1) : PersonId {
     override val origin: Origin
         get() = Origin.TEXT
 }
 
-fun UserId.Companion.testItem(kind: UserKind = UserKind.HUMAN) = TestUserId(kind)
+fun PersonId.Companion.testItem(kind: UserKind = UserKind.HUMAN) = TestUserId(kind)
 
 data class TestChatId(val id: Int = 2) : ChatId {
     override val origin: Origin
@@ -58,8 +58,8 @@ inline fun <reified SCOPE : BotScope> dynamicScopeFor(
     val callContext = CallContext(
         botId = ONLY_BOT,
         chatId = ChatId.testItem(),
-        userId = UserId.testItem(),
-        profile = UserProfile(UserId.testItem()),
+        userId = PersonId.testItem(),
+        profile = PersonProfile(PersonId.testItem()),
         messageId = MessageId.testItem(),
         selfIntentId = "TestIntent1",
         serviceRegistry = serviceRegistry,

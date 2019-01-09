@@ -6,7 +6,7 @@ enum class TextKind {
 
 data class Text(
     override val messageId: MessageId,
-    override val userId: UserId,
+    override val personId: PersonId,
     override val chatId: ChatId,
     val message: String,
     val kind: TextKind,

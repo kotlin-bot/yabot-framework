@@ -1,5 +1,5 @@
 package org.kotlinbot.api.outevents
 
-import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.inevents.PersonId
 
-data class Action(override val chatId: UserId) : OutEvent
+data class Action(override val chatId: PersonId) : OutEvent

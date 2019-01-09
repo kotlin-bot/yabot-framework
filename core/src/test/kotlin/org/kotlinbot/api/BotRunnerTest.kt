@@ -157,7 +157,14 @@ class BotRunnerTest {
     @Test
     fun `callback enevts must be handled throught onCallback`() =
         runBlocking {
-            runner(Callback(MessageId.testItem(), userId = UserId.testItem(), stringData = "handler1|1", native = ""))
+            runner(
+                Callback(
+                    MessageId.testItem(),
+                    personId = PersonId.testItem(),
+                    stringData = "handler1|1",
+                    native = ""
+                )
+            )
             val scope = runner.intentScope<CommonScope>(intent1)
             assertTrue("onCallback must be called", scope.handler1CallbackCalled)
         }
@@ -165,14 +172,28 @@ class BotRunnerTest {
     @Test
     fun `when we receive callback and dont reply it explict - must reply implict`() =
         runBlocking {
-            runner(Callback(MessageId.testItem(), userId = UserId.testItem(), stringData = "handler1|2", native = ""))
+            runner(
+                Callback(
+                    MessageId.testItem(),
+                    personId = PersonId.testItem(),
+                    stringData = "handler1|2",
+                    native = ""
+                )
+            )
             assertTrue("Must send callback reply", runner.messages.any { it is CallbackReply })
         }
 
     @Test
     fun `when we receive callback and  reply it explict - must not send second reply`() =
         runBlocking {
-            runner(Callback(MessageId.testItem(), userId = UserId.testItem(), stringData = "handler1|3", native = ""))
+            runner(
+                Callback(
+                    MessageId.testItem(),
+                    personId = PersonId.testItem(),
+                    stringData = "handler1|3",
+                    native = ""
+                )
+            )
             assertEquals("Must send only one callback reply", 1, runner.messages.count { it is CallbackReply })
         }
 

@@ -3,9 +3,9 @@ package org.kotlinbot.tests
 import kotlinx.coroutines.runBlocking
 import org.kotlinbot.api.*
 import org.kotlinbot.api.inevents.MessageId
+import org.kotlinbot.api.inevents.PersonId
 import org.kotlinbot.api.inevents.Text
 import org.kotlinbot.api.inevents.TextKind
-import org.kotlinbot.api.inevents.UserId
 import org.kotlinbot.api.outevents.TextMessage
 import org.kotlinbot.core.BotRunner
 import org.kotlinbot.core.BotShell
@@ -29,14 +29,14 @@ class TestBotRunnerWrapper(
         this(text(message))
     }
 
-    suspend fun <S : BotScope> intentScope(intentId: IntentId, userId: UserId = UserId.testItem()): S {
+    suspend fun <S : BotScope> intentScope(intentId: IntentId, userId: PersonId = PersonId.testItem()): S {
 
         val botState = getBotStateForUser(userId)
         return createDynamicScope<S>(
             botId = ONLY_BOT,
             userId = userId,
             chatId = userId,
-            userProfile = botState.userProfile,
+            personProfile = botState.personProfile,
             selfIntentId = intentId,
             activeIntentId = intentId,
             values = botState.intentState(intentId),
@@ -45,7 +45,7 @@ class TestBotRunnerWrapper(
         ).asScope()
     }
 
-    suspend fun dumpCommonState(userId: UserId = UserId.testItem()): Map<String, Any?> {
+    suspend fun dumpCommonState(userId: PersonId = PersonId.testItem()): Map<String, Any?> {
         return botStateRepository.get(ONLY_BOT, userId).commonState
     }
 
@@ -56,7 +56,7 @@ class TestBotRunnerWrapper(
         }
     val activeIntentId: IntentId?
         get () = runBlocking {
-            getBotStateForUser(UserId.testItem()).activeIntentId()
+            getBotStateForUser(PersonId.testItem()).activeIntentId()
         }
 
     fun fetchMessagesText(): List<String> {
@@ -66,8 +66,8 @@ class TestBotRunnerWrapper(
     }
 }
 
-fun text(str: String, userId: UserId = UserId.testItem()) = Text(
-    userId = userId,
+fun text(str: String, userId: PersonId = PersonId.testItem()) = Text(
+    personId = userId,
     message = str,
     chatId = TestChatId(),
     kind = TextKind.UNKNOWN,

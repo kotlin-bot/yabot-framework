@@ -2,13 +2,13 @@ package org.kotlinbot.api
 
 import org.kotlinbot.api.inevents.ChatId
 import org.kotlinbot.api.inevents.MessageId
-import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.inevents.PersonId
 
 interface Scope : org.kotlinbot.api.inevents.Source {
     val botId: BotId
     val chatId: ChatId
-    val userId: UserId
-    val profile: UserProfile
+    val userId: PersonId
+    val profile: PersonProfile
     val messageId: MessageId?
 
     override val isTelegram: Boolean

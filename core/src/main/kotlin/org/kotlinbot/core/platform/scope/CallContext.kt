@@ -3,7 +3,7 @@ package org.kotlinbot.core.platform.scope
 import org.kotlinbot.api.*
 import org.kotlinbot.api.inevents.ChatId
 import org.kotlinbot.api.inevents.MessageId
-import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.inevents.PersonId
 import org.kotlinbot.api.methods.AttachmentResolver
 import org.kotlinbot.api.methods.DispatchException
 import org.kotlinbot.api.methods.ReplyMethods
@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 data class CallContext(
     override val botId: BotId,
     override val chatId: ChatId,
-    override val userId: UserId,
-    override val profile: UserProfile,
+    override val userId: PersonId,
+    override val profile: PersonProfile,
     override val messageId: MessageId?,
     override val selfIntentId: IntentId,
     override val activeIntentId: IntentId,

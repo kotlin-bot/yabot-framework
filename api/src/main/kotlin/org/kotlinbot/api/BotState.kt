@@ -1,17 +1,17 @@
 package org.kotlinbot.api
 
-import org.kotlinbot.api.inevents.UserId
+import org.kotlinbot.api.inevents.PersonId
 import java.util.*
 import kotlin.collections.HashMap
 
 data class BotState(
     val botId: BotId,
-    val userId: UserId,
+    val userId: PersonId,
     val callStack: Deque<String> = ArrayDeque(),
     val activityHistory: Deque<String> = ArrayDeque(),
     val commonState: MutableMap<String, Any?> = HashMap(),
     val intentStates: MutableMap<IntentId, MutableMap<String, Any?>> = HashMap(),
-    val userProfile: UserProfile = UserProfile(userId)
+    val personProfile: PersonProfile = PersonProfile(userId)
 ) {
     fun intentState(intentId: IntentId): Map<String, Any?> {
         return commonState + (intentStates[intentId] ?: emptyMap())
